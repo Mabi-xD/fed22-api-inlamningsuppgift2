@@ -21,7 +21,7 @@ model Photo {
    id       Int     @id @default(autoincrement()) @db.UnsignedInt
    title    String
    url      String
-   comment  String  @default("Null")
+   comment  String  @default("")
    userId   Int
    user     User    @relation(fields: [userId], references: [id])
    albums   Album[]

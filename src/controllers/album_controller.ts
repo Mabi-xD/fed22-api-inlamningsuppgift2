@@ -52,3 +52,54 @@ export const show = async (req: Request, res: Response) => {
 		return res.status(404).send({ status: "error", message: "Not found" })
     }
 }
+
+/**
+ * Create an album
+ */
+export const store = async (req: Request, res: Response) => {
+	try {
+		const album = await prisma.album.create({
+            data: {
+                title: req.body.title,
+                user: req.body.user
+            }
+        })
+
+		res.send({
+			status: "success",
+			data: album,
+		})
+
+	} catch (err) {
+		debug("Error thrown when creating an album %o: %o", req.body, err)
+		res.status(500).send({ status: "error", message: "Something went wrong" })
+	}
+}
+
+/**
+ * Update an album
+ */
+export const update = async (req: Request, res: Response) => {
+    const albumId = Number(req.params.albumId)
+
+	try {
+		const album = await prisma.album.update({
+            where: {
+                id: albumId,
+            }, 
+            data: {
+                title: req.body.title
+            }
+        })
+
+		res.send({
+			status: "success",
+			data: album,
+		})
+
+	} catch (err) {
+		debug("Error thrown when creating an album %o: %o", req.body, err)
+		res.status(500).send({ status: "error", message: "Something went wrong" })
+	}
+}
+
