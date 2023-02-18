@@ -1,6 +1,7 @@
 import Debug from 'debug'
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
+import { connect } from 'http2'
 import prisma from '../prisma'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:album_controller')
@@ -103,3 +104,32 @@ export const update = async (req: Request, res: Response) => {
 	}
 }
 
+/**
+ * Add photo to an album
+ */
+export const addPhoto = async (req: Request, res: Response) => {
+    const albumId = Number(req.params.albumId)
+
+	try {
+		const photo = await prisma.photo.create({
+            data: {
+                title: req.body.title,
+                user: req.body.user,
+                url: req.body.url,
+                comment: req.body.url,
+                albums: { 
+                    connect: { id: albumId}
+                },
+            },
+        })
+
+		res.send({
+			status: "success",
+			data: photo,
+		})
+
+	} catch (err) {
+		debug("Error thrown when creating an album %o: %o", req.body, err)
+		res.status(500).send({ status: "error", message: "Something went wrong" })
+	}
+}

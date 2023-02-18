@@ -63,7 +63,7 @@ export const store = async (req: Request, res: Response) => {
 		const photo = await prisma.photo.create({
             data: {
                 title: req.body.title,
-                user: req.body.user,
+                userId: req.body.userId,
                 url: req.body.url,
                 comment: req.body.url,
             }

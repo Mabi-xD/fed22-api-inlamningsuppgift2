@@ -3,6 +3,7 @@ import { login, refresh, register } from '../controllers/user_controller'
 import { validateToken } from '../middlewares/jwt'
 import { createUserRules } from '../validations/user_rules'
 import albums from './albums'
+import photos from './photos'
 
 // instantiate a new router
 const router = express.Router()
@@ -17,10 +18,16 @@ router.get('/', (req, res) => {
 })
 
 /**
- * Get /albumbs
+ * Use /albums
  */
 
 router.use('/albums', albums)
+
+/**
+ * Use /photos
+ */
+
+router.use('/photos', photos)
 
 
 /**
