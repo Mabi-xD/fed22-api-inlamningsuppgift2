@@ -21,13 +21,18 @@ router.get('/', (req, res) => {
  * Use /albums
  */
 
-router.use('/albums', albums)
+router.use('/albums', validateToken, albums)
 
 /**
  * Use /photos
  */
 
-router.use('/photos', photos)
+router.use('/photos', validateToken, photos)
+
+/**
+ * POST /login
+ */
+router.post('/login', login)
 
 
 /**

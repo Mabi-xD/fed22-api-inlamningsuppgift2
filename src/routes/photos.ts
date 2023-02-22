@@ -8,7 +8,7 @@ const router = express.Router()
 router.get('/', index)
 
 /**
- * GET /photos/:bookId
+ * GET /photos/:photoId
  */
 router.get('/:photoId', show)
 

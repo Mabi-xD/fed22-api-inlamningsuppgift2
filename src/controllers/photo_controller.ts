@@ -1,7 +1,8 @@
 import Debug from 'debug'
 import { Request, Response } from 'express'
-import { validationResult } from 'express-validator'
+import { validationResult, matchedData } from 'express-validator'
 import prisma from '../prisma'
+import { getAllPhotos, getPhoto, addPhoto } from '../services/photo_service'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:photo_controller')
 
@@ -13,7 +14,7 @@ const debug = Debug('fed22-api-inlamningsuppgift2:photo_controller')
 
 export const index = async (req: Request, res: Response) => {
     try {
-        const photos = await prisma.photo.findMany()
+        const photos = await getAllPhotos(req.token!.sub)
 
         res.send({
             status: "success",
@@ -34,19 +35,11 @@ export const show = async (req: Request, res: Response) => {
     const photoId = Number(req.params.photoId)
 
     try {
-        const photos = await prisma.photo.findUniqueOrThrow({
-            where: {
-                id: photoId,
-            },
-            include: {
-                user: true,
-                albums: true,
-            }
-        })
+        const photo = await getPhoto(photoId, req.token!.sub)
 
         res.send({
             status: "success",
-            data: photos
+            data: photo
         })
 
     } catch (err){
@@ -59,14 +52,25 @@ export const show = async (req: Request, res: Response) => {
  * Create an photo
  */
 export const store = async (req: Request, res: Response) => {
+    // Check for any validation errors
+	const validationErrors = validationResult(req)
+	if (!validationErrors.isEmpty()) {
+		return res.status(400).send({
+			status: "fail",
+			data: validationErrors.array(),
+		})
+	}
+
+	// Get only the validated data from the request
+	const validatedData = matchedData(req)
+	console.log("validatedData:", validatedData)
+
 	try {
-		const photo = await prisma.photo.create({
-            data: {
-                title: req.body.title,
-                userId: req.body.userId,
-                url: req.body.url,
-                comment: req.body.url,
-            }
+		const photo = await addPhoto({
+            title: validatedData.title,
+            userId: validatedData.userId,
+            url: validatedData.url,
+            comment: validatedData.comment,
         })
 
 		res.send({

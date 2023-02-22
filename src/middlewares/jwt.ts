@@ -6,7 +6,7 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { JwtPayload } from '../../types'
 
-const debug = Debug('prisma-books:jwt')
+const debug = Debug('fed22-api-inlamningsuppgift2:jwt')
 
 /**
  * Validate JWT Access Token

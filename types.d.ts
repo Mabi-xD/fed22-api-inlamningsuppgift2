@@ -2,8 +2,19 @@
  * Type Definitions
  */
 
-export type CreateAuthorData = {
-	name: string,
+export type CreateAlbumData = {
+	title: string,
+}
+
+export type CreatePhotoData = {
+	title: string,
+	url: string,
+	comment: string,
+	userId: number,
+}
+
+export type getPhotoData = {
+	photoId: number,
 }
 
 export type CreateUserData = {

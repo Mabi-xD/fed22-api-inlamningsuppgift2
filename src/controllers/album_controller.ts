@@ -62,7 +62,7 @@ export const store = async (req: Request, res: Response) => {
 		const album = await prisma.album.create({
             data: {
                 title: req.body.title,
-                user: req.body.user
+                userId: req.body.userId
             }
         })
 
@@ -107,14 +107,14 @@ export const update = async (req: Request, res: Response) => {
 /**
  * Add photo to an album
  */
-export const addPhoto = async (req: Request, res: Response) => {
+export const addPhotoToAlbum = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
 
 	try {
 		const photo = await prisma.photo.create({
             data: {
                 title: req.body.title,
-                user: req.body.user,
+                userId: req.body.userId,
                 url: req.body.url,
                 comment: req.body.url,
                 albums: { 
