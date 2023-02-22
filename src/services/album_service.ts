@@ -28,6 +28,8 @@ export const getAlbum = async (albumId: number, sub: number) => {
         where: {
             id: albumId,
             userId: sub,
+        }, include: {
+            photos: true,
         }
     })
 }
@@ -38,7 +40,7 @@ export const getAlbum = async (albumId: number, sub: number) => {
 
 export const addAlbum = async (data: CreateAlbumData) => {
     return  await prisma.album.create({
-        data: data
+        data: data,
     })
 }
 

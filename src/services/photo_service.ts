@@ -5,6 +5,7 @@ import prisma from '../prisma'
 import { UpdatePhotoData, CreatePhotoData } from '../../types'
 
 
+
 /**
  * GET all photos for validated user.
  */
@@ -15,8 +16,6 @@ export const getAllPhotos = async ( sub: number) => {
         }
     })
 }
-
-
 
 /**
  * GET a specific photo for validated user.
@@ -31,6 +30,18 @@ export const getPhoto = async (photoId: number, sub: number) => {
         }
     })
 }
+
+/**
+ * to check if photo exist
+ */
+export const checkPhoto = async (photoId: number) => {
+    return await prisma.photo.findUnique({
+        where: {
+            id: photoId,
+        }
+    })
+}
+
 
 /**
  * POST photo for validated user.

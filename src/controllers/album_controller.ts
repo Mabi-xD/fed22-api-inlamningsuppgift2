@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { validationResult, matchedData } from 'express-validator'
 import prisma from '../prisma'
 import { getAllAlbums, getAlbum, addAlbum } from '../services/album_service'
+import { checkPhoto } from '../services/photo_service'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:album_controller')
 
@@ -99,7 +100,7 @@ export const update = async (req: Request, res: Response) => {
         if(album.id !== req.token!.sub ) {
             return res.status(403).send({ status: "fail", message: "You do not have access to this album."})
         }
-        
+
 		res.send({
 			status: "success",
 			data: album,
@@ -116,36 +117,32 @@ export const update = async (req: Request, res: Response) => {
  */
 export const addPhotoToAlbum = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
+    const { id } = req.body
 
-    // Check for any validation errors
-	const validationErrors = validationResult(req)
-	if (!validationErrors.isEmpty()) {
-		return res.status(400).send({
-			status: "fail",
-			data: validationErrors.array(),
+    const photo = await checkPhoto(id)
+    if (!photo) {
+		return res.status(404).send({
+			status: "error",
+			message: "Photo not found",
 		})
 	}
-
-	// Get only the validated data from the request
-	const validatedData = matchedData(req)
-	console.log("validatedData:", validatedData)
-
 	try {
-		const photo = await prisma.photo.create({
+		const album = await prisma.album.update({
+            where: {
+                id: albumId,
+            }, 
             data: {
-                title: validatedData.title,
-                userId: req.token!.sub,
-                url: validatedData.url,
-                comment: validatedData.url,
-                albums: { 
-                    connect: { id: albumId}
-                },
-            },
-        })
+                photos: {
+                    connect: {
+                      id: id
+                    },
+            }
+        }
+    })
 
 		res.send({
 			status: "success",
-			data: photo,
+			data: album,
 		})
 
 	} catch (err) {
