@@ -34,7 +34,7 @@ export const show = async (req: Request, res: Response) => {
 
     try {
         const album = await getAlbum(albumId, req.token!.sub)
-
+        
         res.send({
             status: "success",
             data: album
@@ -96,6 +96,10 @@ export const update = async (req: Request, res: Response) => {
             }
         })
 
+        if(album.id !== req.token!.sub ) {
+            return res.status(403).send({ status: "fail", message: "You do not have access to this album."})
+        }
+        
 		res.send({
 			status: "success",
 			data: album,
