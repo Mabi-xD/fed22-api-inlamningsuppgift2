@@ -1,8 +1,8 @@
 import Debug from 'debug'
 import { Request, Response } from 'express'
-import { validationResult } from 'express-validator'
-import { connect } from 'http2'
+import { validationResult, matchedData } from 'express-validator'
 import prisma from '../prisma'
+import { getAllAlbums, getAlbum, addAlbum } from '../services/album_service'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:album_controller')
 
@@ -12,7 +12,7 @@ const debug = Debug('fed22-api-inlamningsuppgift2:album_controller')
 
 export const index = async (req: Request, res: Response) => {
     try {
-        const albums = await prisma.album.findMany()
+        const albums = await getAllAlbums(req.token!.sub)
 
         res.send({
             status: "success",
@@ -33,19 +33,11 @@ export const show = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
 
     try {
-        const albums = await prisma.album.findUniqueOrThrow({
-            where: {
-                id: albumId,
-            },
-            include: {
-                user: true,
-                photos: true,
-            }
-        })
+        const album = await getAlbum(albumId, req.token!.sub)
 
         res.send({
             status: "success",
-            data: albums
+            data: album
         })
 
     } catch (err){
@@ -58,12 +50,23 @@ export const show = async (req: Request, res: Response) => {
  * Create an album
  */
 export const store = async (req: Request, res: Response) => {
+    // Check for any validation errors
+	const validationErrors = validationResult(req)
+	if (!validationErrors.isEmpty()) {
+		return res.status(400).send({
+			status: "fail",
+			data: validationErrors.array(),
+		})
+	}
+
+	// Get only the validated data from the request
+	const validatedData = matchedData(req)
+	console.log("validatedData:", validatedData)
+
 	try {
-		const album = await prisma.album.create({
-            data: {
-                title: req.body.title,
-                userId: req.body.userId
-            }
+		const album = await addAlbum({
+            title: validatedData.title,
+            userId: req.token!.sub,
         })
 
 		res.send({
@@ -110,13 +113,26 @@ export const update = async (req: Request, res: Response) => {
 export const addPhotoToAlbum = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
 
+    // Check for any validation errors
+	const validationErrors = validationResult(req)
+	if (!validationErrors.isEmpty()) {
+		return res.status(400).send({
+			status: "fail",
+			data: validationErrors.array(),
+		})
+	}
+
+	// Get only the validated data from the request
+	const validatedData = matchedData(req)
+	console.log("validatedData:", validatedData)
+
 	try {
 		const photo = await prisma.photo.create({
             data: {
-                title: req.body.title,
-                userId: req.body.userId,
-                url: req.body.url,
-                comment: req.body.url,
+                title: validatedData.title,
+                userId: req.token!.sub,
+                url: validatedData.url,
+                comment: validatedData.url,
                 albums: { 
                     connect: { id: albumId}
                 },

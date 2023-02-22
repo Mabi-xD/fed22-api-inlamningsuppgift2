@@ -2,7 +2,7 @@ import Debug from 'debug'
 import { Request, Response } from 'express'
 import { validationResult, matchedData } from 'express-validator'
 import prisma from '../prisma'
-import { getAllPhotos, getPhoto, addPhoto } from '../services/photo_service'
+import { getAllPhotos, getPhoto, addPhoto, updatePhoto } from '../services/photo_service'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:photo_controller')
 
@@ -68,7 +68,7 @@ export const store = async (req: Request, res: Response) => {
 	try {
 		const photo = await addPhoto({
             title: validatedData.title,
-            userId: validatedData.userId,
+            userId: req.token!.sub,
             url: validatedData.url,
             comment: validatedData.comment,
         })
@@ -90,16 +90,21 @@ export const store = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
     const photoId = Number(req.params.photoId)
 
+        // Check for any validation errors
+	const validationErrors = validationResult(req)
+	if (!validationErrors.isEmpty()) {
+		return res.status(400).send({
+			status: "fail",
+			data: validationErrors.array(),
+		})
+	}
+
+	// Get only the validated data from the request
+	const validatedData = matchedData(req)
+	console.log("validatedData:", validatedData)
+
 	try {
-		const photo = await prisma.photo.update({
-            where: {
-                id: photoId,
-            }, 
-            data: {
-                title: req.body.title,
-                comment: req.body.title
-            }
-        })
+		const photo = await updatePhoto(photoId, validatedData)
 
 		res.send({
 			status: "success",

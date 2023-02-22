@@ -2,9 +2,7 @@
  * Photo Service
  */
 import prisma from '../prisma'
-import { matchedData, validationResult } from 'express-validator'
-import { JwtPayload } from '../../types'
-import { CreatePhotoData } from '../../types'
+import { UpdatePhotoData, CreatePhotoData } from '../../types'
 
 
 /**
@@ -40,12 +38,19 @@ export const getPhoto = async (photoId: number, sub: number) => {
 
 export const addPhoto = async (data: CreatePhotoData) => {
     return  await prisma.photo.create({
-        data: {
-            title: data.title,
-            url: data.url,
-            comment: data.comment,
-            userId: data.userId,
-        }
-        
+        data: data
+    })
+}
+
+/**
+ * Update a photo
+ */
+
+export const updatePhoto = async (photoId: number, data: UpdatePhotoData) => {
+    return await prisma.photo.update({
+        where: {
+            id: photoId,
+        }, 
+        data: data
     })
 }

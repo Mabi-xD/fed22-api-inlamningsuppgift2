@@ -4,6 +4,7 @@
 
 export type CreateAlbumData = {
 	title: string,
+	userId: number,
 }
 
 export type CreatePhotoData = {
@@ -13,8 +14,10 @@ export type CreatePhotoData = {
 	userId: number,
 }
 
-export type getPhotoData = {
-	photoId: number,
+export type UpdatePhotoData = {
+	title?: string,
+	comment?: string,
+	url?: string,
 }
 
 export type CreateUserData = {
