@@ -2,7 +2,7 @@ import Debug from 'debug'
 import { Request, Response } from 'express'
 import { validationResult, matchedData } from 'express-validator'
 import prisma from '../prisma'
-import { getAllAlbums, getAlbum, addAlbum } from '../services/album_service'
+import { getAllAlbums, getAlbum, addAlbum, updateAlbum, updateAlbumWithPhoto } from '../services/album_service'
 import { checkPhoto } from '../services/photo_service'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:album_controller')
@@ -86,18 +86,10 @@ export const store = async (req: Request, res: Response) => {
  */
 export const update = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
-
 	try {
-		const album = await prisma.album.update({
-            where: {
-                id: albumId,
-            }, 
-            data: {
-                title: req.body.title
-            }
-        })
+		const album = await updateAlbum(albumId, req.body)
 
-        if(album.id !== req.token!.sub ) {
+        if(album.userId !== req.token!.sub ) {
             return res.status(403).send({ status: "fail", message: "You do not have access to this album."})
         }
 
@@ -118,27 +110,25 @@ export const update = async (req: Request, res: Response) => {
 export const addPhotoToAlbum = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
     const { id } = req.body
-
     const photo = await checkPhoto(id)
+
     if (!photo) {
 		return res.status(404).send({
 			status: "error",
-			message: "Photo not found",
+			message: "That photo doesn't exist",
 		})
 	}
+
+    if(photo.userId !== req.token!.sub) {
+        return res.status(403).send({ status: "fail", message: "You do not have access to this photo."})
+    }
+
 	try {
-		const album = await prisma.album.update({
-            where: {
-                id: albumId,
-            }, 
-            data: {
-                photos: {
-                    connect: {
-                      id: id
-                    },
-            }
-        }
-    })
+		const album = await updateAlbumWithPhoto(albumId, id)
+
+    if(album.userId !== req.token!.sub ) {
+        return res.status(403).send({ status: "fail", message: "You do not have access to this album."})
+    }
 
 		res.send({
 			status: "success",

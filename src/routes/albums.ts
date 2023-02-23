@@ -1,6 +1,6 @@
 import express from 'express'
 import { addPhotoToAlbum, index, show, store, update } from '../controllers/album_controller'
-import { createAlbumRules, addPhotoToAlbumRules } from '../validations/album_rules'
+import { createAlbumRules, addPhotoToAlbumRules, updateAlbumRules } from '../validations/album_rules'
 
 const router = express.Router()
 
@@ -22,7 +22,7 @@ router.post('/', createAlbumRules,  store)
 /**
  * PATCH /albums
  */
-router.patch('/:albumId', update)
+router.patch('/:albumId', updateAlbumRules, update)
 
 /**
  * ADD photo to album
