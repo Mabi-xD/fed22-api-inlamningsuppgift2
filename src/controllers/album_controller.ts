@@ -123,21 +123,9 @@ export const addPhotoToAlbum = async (req: Request, res: Response) => {
         return res.status(403).send({ status: "fail", message: "You do not have access to this photo."})
     }
 
-	// Check for any validation errors
-	const validationErrors = validationResult(req)
-		if (!validationErrors.isEmpty()) {
-			return res.status(400).send({
-				status: "fail",
-				data: validationErrors.array(),
-			})
-		}
-	
-		// Get only the validated data from the request
-		const validatedData = Number(matchedData(req))
-		console.log("validatedData:", validatedData)
 
 	try {
-		const album = await updateAlbumWithPhoto(albumId, validatedData)
+		const album = await updateAlbumWithPhoto(albumId, id)
 
     if(album.userId !== req.token!.sub ) {
         return res.status(403).send({ status: "fail", message: "You do not have access to this album."})

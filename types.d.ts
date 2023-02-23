@@ -7,6 +7,10 @@ export type CreateAlbumData = {
 	userId: number,
 }
 
+export type UpdateAlbumData = {
+	title?: string,
+}
+
 export type CreatePhotoData = {
 	title: string,
 	url: string,
