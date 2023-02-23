@@ -133,7 +133,7 @@ export const addPhotoToAlbum = async (req: Request, res: Response) => {
 
 		res.send({
 			status: "success",
-			data: album,
+			data: null,
 		})
 
 	} catch (err) {
