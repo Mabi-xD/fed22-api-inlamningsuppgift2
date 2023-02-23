@@ -34,6 +34,11 @@ router.use('/photos', validateToken, photos)
  */
 router.post('/login', login)
 
+/**
+ * POST /refresh
+ */
+
+router.post('/refresh', refresh)
 
 /**
  * POST /register
