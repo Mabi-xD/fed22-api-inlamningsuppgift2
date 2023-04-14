@@ -125,7 +125,7 @@ export const addPhotoToAlbum = async (req: Request, res: Response) => {
 
 
 	try {
-		const album = await updateAlbumWithPhoto(albumId, id)
+		const album = await updateAlbumWithPhoto(albumId, photo_id)
 
     if(album.userId !== req.token!.sub ) {
         return res.status(403).send({ status: "fail", message: "You do not have access to this album."})
