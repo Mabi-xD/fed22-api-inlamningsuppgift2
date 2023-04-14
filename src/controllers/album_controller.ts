@@ -109,8 +109,8 @@ export const update = async (req: Request, res: Response) => {
  */
 export const addPhotoToAlbum = async (req: Request, res: Response) => {
     const albumId = Number(req.params.albumId)
-    const { id } = req.body
-    const photo = await checkPhoto(id)
+    const { photo_id } = req.body
+    const photo = await checkPhoto(photo_id)
 
     if (!photo) {
 		return res.status(404).send({
