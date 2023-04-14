@@ -56,7 +56,7 @@ export const login = async (req: Request, res: Response) => {
 		expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '4h',
 	})
 
-	// sign payload with refresh-token secret and get refresh-token
+	
 	if (!process.env.REFRESH_TOKEN_SECRET) {
 		return res.status(500).send({
 			status: "error",
@@ -111,7 +111,11 @@ export const register = async (req: Request, res: Response) => {
 		})
 
 		// Respond with 201 Created + status success
-		res.status(201).send({ status: "success", data: user })
+		res.status(201).send({ status: "success", data: { 
+			first_name: validatedData.first_name,
+            last_name: validatedData.last_name,
+			email: validatedData.email,
+		} })
 
 	} catch (err) {
 		return res.status(500).send({ status: "error", message: "Could not create user in database" })

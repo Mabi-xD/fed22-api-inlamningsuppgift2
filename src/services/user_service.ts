@@ -17,6 +17,7 @@ export const getUserByEmail = async (email: string) => {
 	})
 }
 
+
 /**
  * Create a user
  *

@@ -2,7 +2,7 @@
  * Album Service
  */
 import prisma from '../prisma'
-import { UpdateAlbumData, CreateAlbumData } from '../../types'
+import { CreateAlbumData } from '../../types'
 
 
 /**

@@ -2,7 +2,7 @@ import Debug from 'debug'
 import { Request, Response } from 'express'
 import { validationResult, matchedData } from 'express-validator'
 import prisma from '../prisma'
-import { getAllPhotos, getPhoto, addPhoto, updatePhoto } from '../services/photo_service'
+import { getAllPhotos, getPhoto, addPhoto, updatePhoto, checkPhoto } from '../services/photo_service'
 
 const debug = Debug('fed22-api-inlamningsuppgift2:photo_controller')
 
@@ -23,7 +23,7 @@ export const index = async (req: Request, res: Response) => {
 
     } catch (err){
         debug("Error thrown when finding photos %o", err)
-		return res.status(404).send({ status: "error", message: "Not found" })
+		return res.status(401).send({ status: "error", message: "Not authorized to see this photo" })
     }
 }
 
@@ -44,7 +44,7 @@ export const show = async (req: Request, res: Response) => {
 
     } catch (err){
         debug("Error thrown when finding photos %o", err)
-		return res.status(404).send({ status: "error", message: "Not found" })
+		return res.status(401).send({ status: "error", message: "Not authorized to see this photo" })
     }
 }
 
@@ -90,7 +90,20 @@ export const store = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
     const photoId = Number(req.params.photoId)
 
-        // Check for any validation errors
+    const photo = await checkPhoto(photoId)
+
+    if (!photo) {
+		return res.status(404).send({
+			status: "error",
+			message: "That photo doesn't exist",
+		})
+	}
+
+    if(photo.userId !== req.token!.sub) {
+        return res.status(403).send({ status: "fail", message: "You do not have access to this photo."})
+    }
+
+    // Check for any validation errors
 	const validationErrors = validationResult(req)
 	if (!validationErrors.isEmpty()) {
 		return res.status(400).send({
